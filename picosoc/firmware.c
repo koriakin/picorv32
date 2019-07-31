@@ -22,6 +22,8 @@
 
 #ifdef ICEBREAKER
 #  define MEM_TOTAL 0x20000 /* 128 KB */
+#elif MIMASV2
+#  define MEM_TOTAL 0x10000 /* 64 KB */
 #elif HX8KDEMO
 #  define MEM_TOTAL 0x200 /* 2 KB */
 #else
@@ -107,6 +109,32 @@ void set_flash_mode_quad()
 void set_flash_mode_qddr()
 {
 	reg_spictrl = (reg_spictrl & ~0x00700000) | 0x00600000;
+}
+#endif
+
+#ifdef MIMASV2
+void set_flash_qspi_flag()
+{
+}
+
+void set_flash_mode_spi()
+{
+}
+
+void set_flash_mode_dual()
+{
+}
+
+void set_flash_mode_quad()
+{
+}
+
+void set_flash_mode_qddr()
+{
+}
+
+void enable_flash_crm()
+{
 }
 #endif
 
@@ -224,7 +252,7 @@ char getchar_prompt(char *prompt)
 	uint32_t cycles_begin, cycles_now, cycles;
 	__asm__ volatile ("rdcycle %0" : "=r"(cycles_begin));
 
-	reg_leds = ~0;
+	//reg_leds = ~0;
 
 	if (prompt)
 		print(prompt);
@@ -241,7 +269,7 @@ char getchar_prompt(char *prompt)
 		c = reg_uart_data;
 	}
 
-	reg_leds = 0;
+	reg_leds = c;
 	return c;
 }
 
@@ -383,6 +411,17 @@ void cmd_read_flash_regs()
 	uint8_t cr2v = cmd_read_flash_regs_print(0x800003, "CR2V");
 	uint8_t cr3v = cmd_read_flash_regs_print(0x800004, "CR3V");
 	uint8_t vdlp = cmd_read_flash_regs_print(0x800005, "VDLP");
+}
+#endif
+
+#ifdef MIMASV2
+uint8_t cmd_read_flash_regs_print(uint32_t addr, const char *name)
+{
+	return 0;
+}
+
+void cmd_read_flash_regs()
+{
 }
 #endif
 
@@ -610,6 +649,12 @@ void cmd_benchmark_all()
 }
 #endif
 
+#ifdef MIMASV2
+void cmd_benchmark_all()
+{
+}
+#endif
+
 #ifdef ICEBREAKER
 void cmd_benchmark_all()
 {
@@ -666,7 +711,11 @@ void cmd_echo()
 void main()
 {
 	reg_leds = 31;
+#ifdef MIMASV2
+	reg_uart_clkdiv = 625;
+#else
 	reg_uart_clkdiv = 104;
+#endif
 	print("Booting..\n");
 
 	reg_leds = 63;

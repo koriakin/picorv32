@@ -1,0 +1,5 @@
+read_verilog mimasv2.v spimemio.v simpleuart.v picosoc.v ../picorv32.v
+synth_xilinx -top mimasv2 -family xc6s
+flatten
+iopadmap -bits -outpad OBUF I:O -inpad IBUF O:I
+write_edif -pvector bra mimasv2.edif

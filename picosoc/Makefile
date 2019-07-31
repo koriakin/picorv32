@@ -79,6 +79,15 @@ icebprog: icebreaker.bin icebreaker_fw.bin
 icebprog_fw: icebreaker_fw.bin
 	iceprog -o 1M icebreaker_fw.bin
 
+mimasv2_sections.lds: sections.lds
+	riscv32-unknown-elf-cpp -P -DMIMASV2 -o $@ $^
+
+mimasv2_fw.elf: mimasv2_sections.lds start.s firmware.c
+	riscv32-unknown-elf-gcc -DMIMASV2 -march=rv32ic -Wl,-Bstatic,-T,mimasv2_sections.lds,--strip-debug -ffreestanding -nostdlib -o mimasv2_fw.elf start.s firmware.c
+
+mimasv2_fw.bin: mimasv2_fw.elf
+	riscv32-unknown-elf-objcopy -O binary mimasv2_fw.elf mimasv2_fw.bin
+
 icebreaker_sections.lds: sections.lds
 	riscv32-unknown-elf-cpp -P -DICEBREAKER -o $@ $^
 
